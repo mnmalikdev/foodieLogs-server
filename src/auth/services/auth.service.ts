@@ -121,7 +121,7 @@ export class AuthService {
       signupDTO?.email,
     );
 
-    if (existingUser) {
+    if (existingUser?.data?.user) {
       throw new ConflictException('User already exists');
     }
 

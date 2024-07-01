@@ -34,9 +34,7 @@ export class UserService {
         role: true,
       },
     });
-    if (!user) {
-      throw new NotFoundException(`User with that ${email} is not found`);
-    }
+
     return {
       status: 200,
       message: 'success',

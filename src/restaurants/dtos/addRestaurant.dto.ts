@@ -24,6 +24,7 @@ export class RestaurantDTO {
   @ApiProperty({
     description:
       'A constant number between 1 to 4 while 4 being most expensive and 1 being least expensive',
+    example: 4,
   })
   @IsNumber()
   @IsNotEmpty()
