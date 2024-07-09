@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RestaurantModule } from './restaurants/modules/restaurant.module';
 import { AuthModule } from './auth/modules/auth.module';
+import { UserModule } from './user/module/user.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AuthModule } from './auth/modules/auth.module';
       logging: false,
     }),
     AuthModule,
+    UserModule,
     RestaurantModule,
   ],
   controllers: [AppController],

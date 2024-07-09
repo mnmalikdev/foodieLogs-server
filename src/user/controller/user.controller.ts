@@ -1,6 +1,5 @@
 import {
   Controller,
-  Post,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -13,7 +12,6 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { Request } from 'express';
 import { UserService } from '../services/user.service';
 import { UpdateProfileDto } from '../dtos/updateProfile.dto';
-import { GetUserByEmailDto } from '../dtos/getUserByEmail.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -38,17 +36,5 @@ export class UserController {
       req.user['sub'],
       updateProfileDto,
     );
-  }
-
-  // TODO: Add the DTO
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Post('/getUserByEmail')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({
-    summary: 'Endpoint to get user by email',
-  })
-  async getUserByEmail(@Body() getUserByEmailDto: GetUserByEmailDto) {
-    return await this.userService.fetchUserByEmail(getUserByEmailDto.email);
   }
 }

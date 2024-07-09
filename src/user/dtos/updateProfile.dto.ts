@@ -7,7 +7,7 @@ export class UpdateProfileDto {
   @IsString({
     message: 'Please enter name as string',
   })
-  fullName?: string;
+  userName?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
@@ -16,11 +16,4 @@ export class UpdateProfileDto {
     message: 'Please enter email as string',
   })
   email?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString({
-    message: 'Please enter bio as string',
-  })
-  bio?: string;
 }

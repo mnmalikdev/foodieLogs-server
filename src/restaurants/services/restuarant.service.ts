@@ -138,10 +138,15 @@ export class RestaurantService {
         },
       },
     });
+
+    const transformedRestaurants = restaurants.map((restaurant) => ({
+      ...restaurant,
+      menuItemsCount: restaurant.menuItems.length,
+    }));
     return {
       status: 200,
       message: 'User Restaurants fetched',
-      data: restaurants,
+      data: transformedRestaurants,
     };
   }
 
@@ -159,11 +164,17 @@ export class RestaurantService {
         },
       },
     });
+
+    const transformedRestaurants = restaurants.map((restaurant) => ({
+      ...restaurant,
+      menuItemsCount: restaurant.menuItems.length,
+    }));
+
     return {
       status: 200,
       message: 'Restaurants fetched',
       data: {
-        restaurants,
+        transformedRestaurants,
         restaurantsCount: restaurants?.length,
       },
     };
