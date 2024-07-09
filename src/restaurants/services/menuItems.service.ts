@@ -72,7 +72,7 @@ export class MenuService {
       },
     });
 
-    if (menuItem) {
+    if (!menuItem) {
       throw new NotFoundException('Menu item not found');
     }
 

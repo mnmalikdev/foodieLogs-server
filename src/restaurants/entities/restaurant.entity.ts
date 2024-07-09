@@ -34,8 +34,8 @@ export class Restaurant {
   })
   review: string;
 
-  @ApiProperty()
-  @Column()
+  @ApiProperty({ type: Number, format: 'float' }) // Explicitly specify the type and format
+  @Column('float') // Define the column as a float in TypeORM
   rating: number;
 
   @ApiProperty({

@@ -98,7 +98,10 @@ export class RestaurantService {
     return {
       status: 200,
       message: 'Restaurant fetched',
-      data: restaurant,
+      data: {
+        restaurant,
+        menuItemsCount: restaurant?.menuItems?.length,
+      },
     };
   }
 
@@ -159,7 +162,10 @@ export class RestaurantService {
     return {
       status: 200,
       message: 'Restaurants fetched',
-      data: restaurants,
+      data: {
+        restaurants,
+        restaurantsCount: restaurants?.length,
+      },
     };
   }
 }
