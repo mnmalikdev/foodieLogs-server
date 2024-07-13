@@ -137,6 +137,12 @@ export class RestaurantService {
           email: true,
         },
       },
+      order: {
+        id: 'DESC',
+        menuItems: {
+          id: 'DESC',
+        },
+      },
     });
 
     const transformedRestaurants = restaurants.map((restaurant) => ({
@@ -163,11 +169,17 @@ export class RestaurantService {
           email: true,
         },
       },
+      order: {
+        id: 'DESC',
+        menuItems: {
+          id: 'DESC',
+        },
+      },
     });
 
     const transformedRestaurants = restaurants.map((restaurant) => ({
       ...restaurant,
-      menuItemsCount: restaurant.menuItems.length,
+      menuItemsCount: restaurant?.menuItems?.length,
     }));
 
     return {

@@ -16,4 +16,18 @@ export class UpdateProfileDto {
     message: 'Please enter email as string',
   })
   email?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString({
+    message: 'Please enter password as string',
+  })
+  oldPassword?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString({
+    message: 'Please enter password as string',
+  })
+  newPassword?: string;
 }

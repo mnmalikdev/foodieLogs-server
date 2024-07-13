@@ -33,7 +33,7 @@ export class EditRestaurantDTO {
     description: 'A stringified array that will be later parsed while fetching',
     example: [''],
   })
-  @IsString()
+  @IsOptional()
   @IsArray()
   features: string[];
 
@@ -41,7 +41,6 @@ export class EditRestaurantDTO {
     description: 'A stringified array that will be later parsed while fetching',
     example: [''],
   })
-  @IsString()
   @IsOptional()
   @IsArray()
   categories: string[];

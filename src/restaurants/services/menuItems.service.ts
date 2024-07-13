@@ -39,7 +39,7 @@ export class MenuService {
       },
     });
 
-    if (menuItem) {
+    if (!menuItem) {
       throw new NotFoundException('Menu item not found');
     }
 
@@ -69,6 +69,12 @@ export class MenuService {
       },
       relations: {
         restaurant: true,
+      },
+      order: {
+        id: 'DESC',
+        restaurant: {
+          id: 'DESC',
+        },
       },
     });
 
@@ -107,6 +113,12 @@ export class MenuService {
       relations: {
         restaurant: true,
       },
+      order: {
+        id: 'DESC',
+        restaurant: {
+          id: 'DESC',
+        },
+      },
     });
     return {
       status: 200,
@@ -116,7 +128,14 @@ export class MenuService {
   }
 
   async fetchMenuItems() {
-    const restaurants = await this.menuRepository.find();
+    const restaurants = await this.menuRepository.find({
+      order: {
+        id: 'DESC',
+        restaurant: {
+          id: 'DESC',
+        },
+      },
+    });
     return {
       status: 200,
       message: 'Menu items fetched',

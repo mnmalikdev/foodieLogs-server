@@ -11,9 +11,9 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
-import { EditRestaurantDTO } from '../dtos/editRestaurant.dto';
 import { MenuService } from '../services/menuItems.service';
 import { MenuItemDTO } from '../dtos/addMenuItem.dto';
+import { EditMenuItemDTO } from '../dtos/editMenuItem.dto';
 
 @Controller('menuItems')
 @ApiTags('MenuItems')
@@ -38,7 +38,7 @@ export class MenuItemsController {
   @UseGuards(AuthGuard('jwt'))
   @Patch('/editMenuItem/:id')
   @ApiBody({
-    type: EditRestaurantDTO,
+    type: EditMenuItemDTO,
   })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -46,7 +46,7 @@ export class MenuItemsController {
   })
   async editMenuItem(
     @Param('id') menuItemId: number,
-    @Body() editRestaurant: EditRestaurantDTO,
+    @Body() editRestaurant: EditMenuItemDTO,
   ) {
     return await this.menuItemService.editMenuItem(menuItemId, editRestaurant);
   }
