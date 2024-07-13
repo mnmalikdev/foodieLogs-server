@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
+  ForbiddenException,
   Injectable,
   MethodNotAllowedException,
   NotFoundException,
 } from '@nestjs/common';
-
+import * as argon2 from 'argon2';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { FindOptionsWhere, Repository } from 'typeorm';
@@ -149,6 +151,23 @@ export class UserService {
     }
   }
 
+  async hashData(data: string) {
+    try {
+      if (!data) {
+        throw new Error('Invalid input for hashing');
+      }
+      return await argon2.hash(data, {
+        type: argon2.argon2id,
+        timeCost: 10,
+        memoryCost: 2 ** 16,
+        parallelism: 1,
+      });
+    } catch (error) {
+      console.error('Hashing error:', error);
+      throw new Error('Hashing failed');
+    }
+  }
+
   async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
     try {
       const user = await this.fetchUserById(userId);
@@ -159,8 +178,33 @@ export class UserService {
         ...user,
         ...updateProfileDto,
       });
+      // update password logic
+
+      if (updateProfileDto?.oldPassword && updateProfileDto?.newPassword) {
+        const passwordMatches = await argon2.verify(
+          user.password,
+          updateProfileDto?.oldPassword,
+        );
+
+        if (!passwordMatches) {
+          throw new BadRequestException(
+            'Old Password is incorrect ! Please try forget password option if you forgot your password',
+          );
+        }
+
+        const hashedPassword = await this.hashData(
+          updateProfileDto?.newPassword,
+        );
+        user.password = hashedPassword;
+        await this.updateUserField(user.id, 'password', hashedPassword);
+        delete updatedUser.newPassword;
+        delete updatedUser.oldPassword;
+      }
+
+      // update password logic
       delete updatedUser.password;
       delete updatedUser.hashedRt;
+
       return {
         status: 200,
         message: 'Profile updated successfully',
