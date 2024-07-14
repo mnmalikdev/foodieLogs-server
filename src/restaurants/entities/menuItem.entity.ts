@@ -1,4 +1,3 @@
-// user.entity.ts
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Restaurant } from './restaurant.entity';
@@ -21,8 +20,8 @@ export class MenuItem {
   })
   review: string;
 
-  @ApiProperty()
-  @Column()
+  @ApiProperty({ type: Number, format: 'float' }) // Explicitly specify the type and format
+  @Column('float')
   rating: number;
 
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.menuItems, {

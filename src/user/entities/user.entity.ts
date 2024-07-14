@@ -43,4 +43,8 @@ export class User {
     onUpdate: 'CASCADE',
   })
   restaurants: Restaurant[];
+
+  // one user can have many favourite restaurants
+  @OneToMany(() => Restaurant, (restaurant) => restaurant.favouritedByUser)
+  favouriteRestaurants: Restaurant[];
 }

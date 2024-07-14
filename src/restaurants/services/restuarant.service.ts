@@ -4,12 +4,15 @@ import { Repository } from 'typeorm';
 import { Restaurant } from '../entities/restaurant.entity';
 import { RestaurantDTO } from '../dtos/addRestaurant.dto';
 import { EditRestaurantDTO } from '../dtos/editRestaurant.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class RestaurantService {
   constructor(
     @InjectRepository(Restaurant)
     public restaurantRepository: Repository<Restaurant>,
+    @InjectRepository(User)
+    public userRepository: Repository<User>,
   ) {}
 
   async addRestaurant(userId: number, addRestaurantDto: RestaurantDTO) {
@@ -129,6 +132,7 @@ export class RestaurantService {
       relations: {
         user: true,
         menuItems: true,
+        favouritedByUser: true,
       },
       select: {
         user: {
@@ -147,7 +151,7 @@ export class RestaurantService {
 
     const transformedRestaurants = restaurants.map((restaurant) => ({
       ...restaurant,
-      menuItemsCount: restaurant.menuItems.length,
+      menuItemsCount: restaurant?.menuItems?.length,
     }));
     return {
       status: 200,
@@ -188,6 +192,36 @@ export class RestaurantService {
       data: {
         transformedRestaurants,
         restaurantsCount: restaurants?.length,
+      },
+    };
+  }
+
+  async addFavouriteRestaurant(userId: number, restaurantId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['favouriteRestaurants'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const restaurant = await this.restaurantRepository.findOne({
+      where: { id: restaurantId },
+    });
+
+    if (!restaurant) {
+      throw new NotFoundException('Restaurant not found');
+    }
+
+    user.favouriteRestaurants.push(restaurant);
+    await this.userRepository.save(user);
+
+    return {
+      status: 200,
+      message: 'Restaurants Added to Favourite',
+      data: {
+        restaurant,
       },
     };
   }

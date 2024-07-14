@@ -90,4 +90,21 @@ export class RestaurantController {
   async getMyRestaurants(@Param('userId') userId: number) {
     return await this.restaurantService.fetchMyRestaurants(userId);
   }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/favouriteARestaurant/:restaurantId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Endpoint to add a restaurants',
+  })
+  async addRestaurantToFavourite(
+    @Req() req: Request,
+    @Param('restaurantId') restaurantId: number,
+  ) {
+    return await this.restaurantService.addFavouriteRestaurant(
+      req.user['sub'],
+      restaurantId,
+    );
+  }
 }

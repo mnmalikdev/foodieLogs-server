@@ -1,4 +1,3 @@
-// user.entity.ts
 import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
@@ -69,4 +68,10 @@ export class Restaurant {
     onUpdate: 'CASCADE',
   })
   user: User;
+
+  @ManyToOne(() => User, (user) => user.favouriteRestaurants, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  favouritedByUser: User;
 }
