@@ -8,12 +8,14 @@ import {
   Patch,
   Get,
   Param,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { MenuService } from '../services/menuItems.service';
 import { MenuItemDTO } from '../dtos/addMenuItem.dto';
 import { EditMenuItemDTO } from '../dtos/editMenuItem.dto';
+import { ItemFilters, ItemOrders } from '../enums/FilterTypes';
 
 @Controller('menuItems')
 @ApiTags('MenuItems')
@@ -65,8 +67,12 @@ export class MenuItemsController {
   @ApiOperation({
     summary: 'Endpoint to fetch all menu items',
   })
-  async getRestaurants() {
-    return await this.menuItemService.fetchMenuItems();
+  async getRestaurants(
+    @Query('filterOption') filterOption :ItemFilters , 
+    @Query('filterOrder') filterOrder: ItemOrders,
+    @Query('userId') userId: number
+  ) {
+    return await this.menuItemService.fetchMenuItems(filterOption,filterOrder,userId);
   }
 
   @Get('/fetchRestaurantMenuItems/:restaurantId')
@@ -76,5 +82,15 @@ export class MenuItemsController {
   })
   async getMyRestaurants(@Param('restaurantId') restaurantId: number) {
     return await this.menuItemService.fetchRestaurantsMenuItems(restaurantId);
+  }
+
+
+  @Post('/favouriteAMenuItem:menuItemId/:userId')
+  async addFavoriteMenuItem(
+    @Param('menuItemId') menuItemId: number,
+    @Param('userId') userId: number,
+  ): Promise<void> {
+    console.log(userId , menuItemId)
+    await this.menuItemService.addFavoriteMenuItem(userId, menuItemId);
   }
 }

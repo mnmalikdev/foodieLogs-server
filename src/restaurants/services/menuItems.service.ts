@@ -4,13 +4,18 @@ import { Repository } from 'typeorm';
 import { MenuItem } from '../entities/menuItem.entity';
 import { MenuItemDTO } from '../dtos/addMenuItem.dto';
 import { EditMenuItemDTO } from '../dtos/editMenuItem.dto';
+import { ItemFilters, ItemOrders } from '../enums/FilterTypes';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class MenuService {
   constructor(
     @InjectRepository(MenuItem)
     public menuRepository: Repository<MenuItem>,
-  ) {}
+
+    @InjectRepository(User)
+    public userRepository: Repository<User>,
+  ) { }
 
   async addMenuItem(addMenuItemDto: MenuItemDTO) {
     const menuItem = new MenuItem();
@@ -127,19 +132,76 @@ export class MenuService {
     };
   }
 
-  async fetchMenuItems() {
-    const restaurants = await this.menuRepository.find({
-      order: {
-        id: 'DESC',
-        restaurant: {
-          id: 'DESC',
-        },
-      },
+  async fetchMenuItems(filterOption: ItemFilters, order: ItemOrders, userId: number) {
+
+    const orderObject: any = {
+
+    }
+
+    if (filterOption === ItemFilters.Rating) {
+      orderObject.rating = order
+    } else if (filterOption === ItemFilters.Alphabetical) {
+      orderObject.name = order
+    }
+    else {
+      orderObject.rating = 'DESC'
+    }
+
+
+    console.log(orderObject)
+    let restaurants = await this.menuRepository.find({
+      order: orderObject,
+      relations: {
+        restaurant: true,
+        favoritedBy: true,
+
+      }
     });
+
+
+    if (filterOption === ItemFilters.Favourite) {
+
+      restaurants = restaurants.sort((a, b) => {
+        const aFavorited = a.favoritedBy.some(user => user.id === userId);
+        const bFavorited = b.favoritedBy.some(user => user.id === userId);
+
+        if (aFavorited && !bFavorited) {
+          return -1;
+        } else if (!aFavorited && bFavorited) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+    }
+
     return {
       status: 200,
       message: 'Menu items fetched',
       data: restaurants,
     };
+  }
+
+
+
+
+
+  async addFavoriteMenuItem(userId: number, menuItemId: number): Promise<void> {
+
+    console.log(userId, menuItemId)
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['favoriteMenuItems'],
+    });
+    const menuItem = await this.menuRepository.findOne({ where: { id: menuItemId } });
+
+    console.log(user)
+    console.log(menuItem)
+    if (!user || !menuItem) {
+      throw new Error('User or MenuItem not found');
+    }
+
+    user.favoriteMenuItems.push(menuItem);
+    await this.userRepository.save(user);
   }
 }

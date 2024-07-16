@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Restaurant } from './restaurant.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Entity()
 export class MenuItem {
@@ -29,4 +30,8 @@ export class MenuItem {
     onUpdate: 'CASCADE',
   })
   restaurant: Restaurant;
+
+  @ManyToMany(() => User, (user) => user.favoriteMenuItems)
+  @JoinTable()
+  favoritedBy: User[];
 }

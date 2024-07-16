@@ -9,6 +9,7 @@ import {
   Patch,
   Get,
   Param,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -18,6 +19,7 @@ import { Request } from 'express';
 import { RestaurantDTO } from '../dtos/addRestaurant.dto';
 import { RestaurantService } from '../services/restuarant.service';
 import { EditRestaurantDTO } from '../dtos/editRestaurant.dto';
+import FilterTypes, { Filter } from '../enums/FilterTypes';
 
 @Controller('restaurants')
 @ApiTags('Restaurants')
@@ -87,10 +89,11 @@ export class RestaurantController {
   @ApiOperation({
     summary: 'Endpoint to fetch all restaurants',
   })
-  async getMyRestaurants(@Param('userId') userId: number) {
-    return await this.restaurantService.fetchMyRestaurants(userId);
+  async getMyRestaurants(@Param('userId') userId: number, @Query('searchQuery') searchQuery ?: string,   @Query('filters') filters?: string ) {
+    const parsedFilters: Filter[] = filters ? JSON.parse(filters) : [];
+    return await this.restaurantService.fetchMyRestaurants(userId,searchQuery,parsedFilters);
   }
-
+ 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post('/favouriteARestaurant/:restaurantId')

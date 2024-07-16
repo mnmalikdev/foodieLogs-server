@@ -1,8 +1,9 @@
 // user.entity.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import Role from '../enums/role';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
+import { MenuItem } from 'src/restaurants/entities/menuItem.entity';
 
 @Entity()
 export class User {
@@ -47,4 +48,7 @@ export class User {
   // one user can have many favourite restaurants
   @OneToMany(() => Restaurant, (restaurant) => restaurant.favouritedByUser)
   favouriteRestaurants: Restaurant[];
+
+  @ManyToMany(() => MenuItem, (menuItem) => menuItem.favoritedBy)
+  favoriteMenuItems: MenuItem[];
 }

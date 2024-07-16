@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Like, Repository } from 'typeorm';
 import { Restaurant } from '../entities/restaurant.entity';
 import { RestaurantDTO } from '../dtos/addRestaurant.dto';
 import { EditRestaurantDTO } from '../dtos/editRestaurant.dto';
 import { User } from 'src/user/entities/user.entity';
+import FilterTypes, { Filter } from '../enums/FilterTypes';
+import { filter } from 'rxjs';
 
 @Injectable()
 export class RestaurantService {
@@ -122,13 +124,55 @@ export class RestaurantService {
     });
   }
 
-  async fetchMyRestaurants(userId: number) {
-    const restaurants = await this.restaurantRepository.find({
-      where: {
-        user: {
-          id: userId,
-        },
+  async fetchMyRestaurants(userId: number, searchQuery:string, filters?: Filter[]) {
+
+    const whereCondition: any = {
+      user: {
+        id: userId,
       },
+    };
+
+    if (searchQuery) {
+      whereCondition.name = Like(`%${searchQuery}%`);
+    }
+
+    if (filters && filters.length > 0) {
+      filters.forEach(filter => {
+        switch (filter.type) {
+          case FilterTypes.Category:
+            whereCondition.categories = Like(`%${filter.value}%`);
+            break;
+          case FilterTypes.Price:
+            let priceRange: [number, number];
+            if (filter.value === '$') {
+              priceRange = [0, 10];
+            } else if (filter.value === '$$') {
+              priceRange = [11, 30];
+            } else if (filter.value === '$$$') {
+              priceRange = [31, 100]; // Adjust the upper limit as needed
+            } else {
+              priceRange = [0, 100]; // Default range if no valid filter value is provided
+            }
+            whereCondition.price = Between(priceRange[0], priceRange[1]);
+            break;
+          case FilterTypes.Features:
+            whereCondition.features = Like(`%${filter.value}%`);
+            break;
+          case FilterTypes.Location:
+            whereCondition.location = Like(`%${filter.value}%`);
+            break;
+          default:
+            break;
+        }
+      });
+    }
+ 
+
+    const restaurants = await this.restaurantRepository.find({
+      where: whereCondition,
+  
+
+    
       relations: {
         user: true,
         menuItems: true,
